@@ -1,0 +1,255 @@
+Index: admin/src/main/java/com/zys/pojo/Admin.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zys.pojo;\r\n\r\n/**\r\n * @USER 张英帅\r\n * @date 2021/5/18 - 16:10\r\n */\r\npublic class Admin {\r\n    private String admAccount;\r\n    private String admPassword;\r\n    private String admLev;\r\n    private String admName;\r\n    private String admDepartment;\r\n\r\n    public Admin() {\r\n    }\r\n\r\n    public Admin(String admAccount, String admPassword, String admLev, String admName, String admDepartment) {\r\n        this.admAccount = admAccount;\r\n        this.admPassword = admPassword;\r\n        this.admLev = admLev;\r\n        this.admName = admName;\r\n        this.admDepartment = admDepartment;\r\n    }\r\n\r\n    public String getAdmAccount() {\r\n        return admAccount;\r\n    }\r\n\r\n    public void setAdmAccount(String admAccount) {\r\n        this.admAccount = admAccount;\r\n    }\r\n\r\n    public String getAdmPassword() {\r\n        return admPassword;\r\n    }\r\n\r\n    public void setAdmPassword(String admPassword) {\r\n        this.admPassword = admPassword;\r\n    }\r\n\r\n    public String getAdmLev() {\r\n        return admLev;\r\n    }\r\n\r\n    public void setAdmLev(String admLev) {\r\n        this.admLev = admLev;\r\n    }\r\n\r\n    public String getAdmName() {\r\n        return admName;\r\n    }\r\n\r\n    public void setAdmName(String admName) {\r\n        this.admName = admName;\r\n    }\r\n\r\n    public String getAdmDepartment() {\r\n        return admDepartment;\r\n    }\r\n\r\n    public void setAdmDepartment(String admDepartment) {\r\n        this.admDepartment = admDepartment;\r\n    }\r\n\r\n    @Override\r\n    public String toString() {\r\n        return \"Admin{\" +\r\n                \"admAccount='\" + admAccount + '\\'' +\r\n                \", admPassword='\" + admPassword + '\\'' +\r\n                \", admLev='\" + admLev + '\\'' +\r\n                \", admName='\" + admName + '\\'' +\r\n                \", admDepartment='\" + admDepartment + '\\'' +\r\n                '}';\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/admin/src/main/java/com/zys/pojo/Admin.java b/admin/src/main/java/com/zys/pojo/Admin.java
+--- a/admin/src/main/java/com/zys/pojo/Admin.java	(revision 69eb713dbd3d1c3e7859677e4ce07a0236151c51)
++++ b/admin/src/main/java/com/zys/pojo/Admin.java	(date 1623288092372)
+@@ -1,10 +1,12 @@
+ package com.zys.pojo;
+ 
++import java.io.Serializable;
++
+ /**
+  * @USER 张英帅
+  * @date 2021/5/18 - 16:10
+  */
+-public class Admin {
++public class Admin implements Serializable {
+     private String admAccount;
+     private String admPassword;
+     private String admLev;
+Index: teacher/src/main/java/com/teacher/controller/LoginController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.teacher.controller;\r\n\r\nimport com.select.pojo.Teacher;\r\nimport com.teacher.service.LoginService;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.stereotype.Controller;\r\nimport org.springframework.web.bind.annotation.CrossOrigin;\r\nimport org.springframework.web.bind.annotation.GetMapping;\r\nimport org.springframework.web.bind.annotation.ResponseBody;\r\n\r\n/**\r\n * @author zhanglei\r\n */\r\n@CrossOrigin\r\n@Controller\r\npublic class LoginController {\r\n\r\n    @Autowired\r\n    LoginService loginService;\r\n    Teacher teacher;\r\n\r\n    /**\r\n     * 登录接口\r\n     * @param teacher\r\n     * @return\r\n     */\r\n    @GetMapping(\"/denglu\")\r\n    @ResponseBody\r\n    public String denglu(Teacher teacher) {\r\n        if (loginService.find(teacher) == null) {\r\n            return \"fail\";\r\n        } else {\r\n            return \"success\";\r\n        }\r\n\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/teacher/src/main/java/com/teacher/controller/LoginController.java b/teacher/src/main/java/com/teacher/controller/LoginController.java
+--- a/teacher/src/main/java/com/teacher/controller/LoginController.java	(revision 69eb713dbd3d1c3e7859677e4ce07a0236151c51)
++++ b/teacher/src/main/java/com/teacher/controller/LoginController.java	(date 1623286982329)
+@@ -3,11 +3,16 @@
+ import com.select.pojo.Teacher;
+ import com.teacher.service.LoginService;
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.data.redis.core.RedisTemplate;
+ import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.CrossOrigin;
+ import org.springframework.web.bind.annotation.GetMapping;
+ import org.springframework.web.bind.annotation.ResponseBody;
+ 
++import javax.annotation.Resource;
++import java.time.Duration;
++import java.util.UUID;
++
+ /**
+  * @author zhanglei
+  */
+@@ -19,6 +24,9 @@
+     LoginService loginService;
+     Teacher teacher;
+ 
++    @Resource
++    private RedisTemplate<String, Object> redisTemplate;
++
+     /**
+      * 登录接口
+      * @param teacher
+@@ -27,9 +35,13 @@
+     @GetMapping("/denglu")
+     @ResponseBody
+     public String denglu(Teacher teacher) {
++        System.out.println(teacher);
+         if (loginService.find(teacher) == null) {
+             return "fail";
+         } else {
++            String token = UUID.randomUUID() + "";
++            System.out.println(token);
++            this.redisTemplate.opsForValue().set(token, loginService.find(teacher), Duration.ofMinutes(30L));
+             return "success";
+         }
+ 
+Index: admin/src/main/java/com/zys/controller/AdminController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zys.controller;\r\n\r\nimport com.alibaba.csp.sentinel.annotation.SentinelResource;\r\nimport com.github.pagehelper.PageHelper;\r\nimport com.github.pagehelper.PageInfo;\r\nimport com.select.pojo.Teacher;\r\nimport com.select.utils.CommonResult;\r\nimport com.zys.feign.TeacherFeignService;\r\nimport com.zys.pojo.Admin;\r\nimport com.zys.service.AdminService;\r\nimport com.zys.service.TeacherService;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.web.bind.annotation.*;\r\n\r\nimport java.util.HashMap;\r\nimport java.util.List;\r\nimport java.util.Map;\r\n\r\n/**\r\n * @USER 张英帅\r\n * @date 2021/5/18 - 16:48\r\n */\r\n@RestController\r\n@CrossOrigin\r\n@RequestMapping(\"admin\")\r\npublic class AdminController {\r\n\r\n    @Autowired\r\n    private AdminService adminService;\r\n    @Autowired\r\n    private TeacherService teacherService;\r\n    @Autowired\r\n    private TeacherFeignService teacherFeignService;\r\n\r\n    //登陆验证\r\n    @PostMapping(\"/login\")\r\n    @SentinelResource(value = \"login\")\r\n    public CommonResult adminLogin(Admin admin){\r\n        Admin getAdmin = adminService.adminLogin(admin);\r\n        if(getAdmin != null){\r\n            return CommonResult.ok(\"登陆成功\",getAdmin);\r\n        }\r\n        return CommonResult.ok(\"账号密码错误或不存在\",null);\r\n    }\r\n    //管理员修改个人密码\r\n    @PutMapping(\"/updateAdmPass\")\r\n    @SentinelResource(value = \"updateAdmPass\")\r\n    public CommonResult updateAdmPass(Admin admin){\r\n        int i = adminService.updateAdmPass(admin);\r\n        if(i > 0){\r\n            return CommonResult.ok(\"修改成功\",i);\r\n        }\r\n        return CommonResult.ok(\"修改失败\",null);\r\n    }\r\n    //查询所有管理员--也可条件查询\r\n    @GetMapping(\"/getAdmin\")\r\n    @SentinelResource(value = \"getAdmin\")\r\n    public CommonResult getAdmin(Admin admin,String admLoginAcc){\r\n        List<Admin> adminList = null;\r\n        //判断搜索框是否为空，不为空就查找该字段的人，为空就查找除登陆账号以外的所有数据\r\n        if(admin.getAdmAccount() == \"\"){\r\n            adminList = adminService.getAdminAllButOwn(admLoginAcc);\r\n        }else{\r\n            adminList = adminService.getAdmin(admin);\r\n        }\r\n\r\n        if(adminList != null){\r\n            return CommonResult.ok(\"查询成功\",adminList);\r\n        }\r\n        return CommonResult.ok(\"查询失败，无数据或无此人\",null);\r\n    }\r\n    //查询所有管理员但排除登陆的账号\r\n    @GetMapping(\"/getAdminAllButOwn/{acc}\")\r\n    @SentinelResource(value = \"/getAdminAllButOwn/{acc}\")\r\n    public Map<String, Object> getAdminAllButOwn(@PathVariable(\"acc\")String admAccount,\r\n                                          @RequestParam(value = \"page\",defaultValue = \"1\")Integer pn,\r\n                                          @RequestParam(value = \"limit\",defaultValue = \"10\")Integer limit){\r\n        PageHelper.startPage(pn,limit);//startPage后面紧跟的这个查询就是分页查询了\r\n        List<Admin> adminList = adminService.getAdminAllButOwn(admAccount);\r\n        PageInfo page = new PageInfo(adminList,limit);\r\n        Map<String,Object> pageMap = new HashMap<>();\r\n        pageMap.put(\"code\",200);\r\n        pageMap.put(\"msg\",\"处理成功\");\r\n        pageMap.put(\"data\",page.getList());\r\n        pageMap.put(\"count\",page.getTotal());\r\n        return pageMap;\r\n    }\r\n    //删除管理\r\n    @DeleteMapping(\"/deleteAdminByAcc/{admAccount}\")\r\n    @SentinelResource(value = \"/deleteAdminByAcc/{admAccount}\")\r\n    public CommonResult deleteAdmin(@PathVariable(\"admAccount\") String admAccount){\r\n        int i = adminService.deleteAdmin(admAccount);\r\n        if(i > 0){\r\n//            List<Teacher> teaByAn = teacherService.getTeaByAccount(admAccount);\r\n            List<Teacher> teaByAn = teacherFeignService.getTeaByAccList(admAccount);\r\n            if(!teaByAn.isEmpty() || teaByAn != null){\r\n                int i1 = teacherService.updateTeaLev(\"0\", admAccount);\r\n                if(i1>0){\r\n                    return CommonResult.ok(\"删除成功\",i1);\r\n                }\r\n            }else{\r\n                return CommonResult.ok(\"删除成功\",i);\r\n            }\r\n        }\r\n        return CommonResult.ok(\"删除失败\",null);\r\n    }\r\n\r\n    //授权老师添加管理员\r\n    @PostMapping(\"/addAdmin\")\r\n    @SentinelResource(value = \"addAdmin\")\r\n    public CommonResult addAdmin(Admin admin){\r\n        int i = adminService.addAdmin(admin);\r\n        if(i > 0){\r\n            int i1 = teacherService.updateTeaLev(admin.getAdmLev(), admin.getAdmAccount());\r\n            if(i1 > 0){\r\n                return CommonResult.ok(\"授权成功\",i1);\r\n            }\r\n        }\r\n        return CommonResult.ok(\"授权失败\",null);\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/admin/src/main/java/com/zys/controller/AdminController.java b/admin/src/main/java/com/zys/controller/AdminController.java
+--- a/admin/src/main/java/com/zys/controller/AdminController.java	(revision 69eb713dbd3d1c3e7859677e4ce07a0236151c51)
++++ b/admin/src/main/java/com/zys/controller/AdminController.java	(date 1623287902670)
+@@ -10,11 +10,15 @@
+ import com.zys.service.AdminService;
+ import com.zys.service.TeacherService;
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.data.redis.core.RedisTemplate;
+ import org.springframework.web.bind.annotation.*;
+ 
++import javax.annotation.Resource;
++import java.time.Duration;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
++import java.util.UUID;
+ 
+ /**
+  * @USER 张英帅
+@@ -31,13 +35,17 @@
+     private TeacherService teacherService;
+     @Autowired
+     private TeacherFeignService teacherFeignService;
++    @Resource
++    private RedisTemplate<String, Object> redisTemplate;
+ 
+     //登陆验证
+     @PostMapping("/login")
+-    @SentinelResource(value = "login")
+     public CommonResult adminLogin(Admin admin){
+         Admin getAdmin = adminService.adminLogin(admin);
+         if(getAdmin != null){
++            String token = UUID.randomUUID() + "";
++            System.out.println(token);
++            this.redisTemplate.opsForValue().set(token,getAdmin, Duration.ofMinutes(30L));
+             return CommonResult.ok("登陆成功",getAdmin);
+         }
+         return CommonResult.ok("账号密码错误或不存在",null);
+Index: admin/src/main/resources/application.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>server:\r\n  port: 8001\r\npagehelper:\r\n  helper-dialect: mysql\r\n  reasonable: true\r\nlogging:\r\n  level:\r\n    com.zys: debug\r\nmybatis:\r\n  configuration:\r\n    map-underscore-to-camel-case: true\r\nspring:\r\n  application:\r\n    name: nacos-Admin\r\n  cloud:\r\n    nacos:\r\n      discovery:\r\n        server-addr: 8.140.184.29:8848 #配置linux使用nginx集群的nacos地址\r\n    #        server-addr: localhost:8848 #配置linux使用nginx集群的nacos地址\r\n    sentinel:\r\n      transport:\r\n        dashboard: aleibaba.top:8080\r\n        port: 8719  #默认8719，假如被占用了会自动从8719开始依次+1扫描。直至找到未被占用的端口\r\n  #        clientIp: localhost\r\n\r\n  datasource:\r\n    type: com.alibaba.druid.pool.DruidDataSource\r\n    driver-class-name: com.mysql.jdbc.Driver\r\n#    url: jdbc:mysql://aleibaba.top:3306/selectCourse?useUnicode=true&characterEncoding=utf-8&useSSL=false\r\n    url: jdbc:mysql://localhost:3307/selectcourse?useUnicode=true&characterEncoding=utf-8&useSSL=false\r\n    username: root\r\n#    password: zhanglei\r\n    password: ROOTzys525#\r\n    #   druid数据源相关配置，，，但默认以下配置不生效\r\n    initialSize: 5\r\n    minIdle: 5\r\n    maxActive: 20\r\n    maxWait: 60000\r\n    timeBetweenEvictionRunsMillis: 60000\r\n    minEvictableIdleTimeMillis: 300000\r\n    validationQuery: SELECT 1 FROM DUAL\r\n    testWhileIdle: true\r\n    testOnBorrow: false\r\n    testOnReturn: false\r\n    poolPreparedStatements: true\r\n    #   配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙\r\n    filters: stat,wall,log4j\r\n    maxPoolPreparedStatementPerConnectionSize: 20\r\n    useGlobalDataSourceStat: true\r\n    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500\r\n\r\nmanagement:\r\n  endpoints:\r\n    web:\r\n      exposure:\r\n        include: '*'\r\nfeign:\r\n  hystrix:\r\n    enabled: true\r\nhystrix:\r\n  command:\r\n    default:\r\n      execution:\r\n        isolation:\r\n          thread:\r\n            timeoutInMilliseconds: 4000
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/admin/src/main/resources/application.yml b/admin/src/main/resources/application.yml
+--- a/admin/src/main/resources/application.yml	(revision 69eb713dbd3d1c3e7859677e4ce07a0236151c51)
++++ b/admin/src/main/resources/application.yml	(date 1623287632334)
+@@ -22,15 +22,32 @@
+         dashboard: aleibaba.top:8080
+         port: 8719  #默认8719，假如被占用了会自动从8719开始依次+1扫描。直至找到未被占用的端口
+   #        clientIp: localhost
+-
++  redis:
++    #数据库索引
++    database: 3
++    host: 8.140.184.29
++    port: 6379
++    password: zhang
++    jedis:
++      pool:
++        #最大连接数
++        max-active: 8
++        #最大阻塞等待时间(负数表示没限制)
++        max-wait: -1
++        #最大空闲
++        max-idle: 8
++        #最小空闲
++        min-idle: 0
++        #连接超时时间
++        timeout: 10000
+   datasource:
+     type: com.alibaba.druid.pool.DruidDataSource
+     driver-class-name: com.mysql.jdbc.Driver
+-#    url: jdbc:mysql://aleibaba.top:3306/selectCourse?useUnicode=true&characterEncoding=utf-8&useSSL=false
+-    url: jdbc:mysql://localhost:3307/selectcourse?useUnicode=true&characterEncoding=utf-8&useSSL=false
++    url: jdbc:mysql://aleibaba.top:3306/selectCourse?useUnicode=true&characterEncoding=utf-8&useSSL=false
++#    url: jdbc:mysql://localhost:3307/selectcourse?useUnicode=true&characterEncoding=utf-8&useSSL=false
+     username: root
+-#    password: zhanglei
+-    password: ROOTzys525#
++    password: zhanglei
++#    password: ROOTzys525#
+     #   druid数据源相关配置，，，但默认以下配置不生效
+     initialSize: 5
+     minIdle: 5
+Index: teacher/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\r\n    <parent>\r\n        <artifactId>spring_xk</artifactId>\r\n        <groupId>org.example</groupId>\r\n        <version>1.0-SNAPSHOT</version>\r\n    </parent>\r\n    <modelVersion>4.0.0</modelVersion>\r\n\r\n    <artifactId>teacher</artifactId>\r\n\r\n    <dependencies>\r\n        <dependency>\r\n            <groupId>org.example</groupId>\r\n            <artifactId>common</artifactId>\r\n            <version>1.0-SNAPSHOT</version>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-starter-actuator</artifactId>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-starter-web</artifactId>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-starter-test</artifactId>\r\n            <scope>test</scope>\r\n        </dependency>\r\n        <!--devtools热部署-->\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-devtools</artifactId>\r\n            <optional>true</optional>\r\n            <scope>true</scope>\r\n        </dependency>\r\n        <!--excel-->\r\n        <dependency>\r\n            <groupId>com.alibaba</groupId>\r\n            <artifactId>easyexcel</artifactId>\r\n            <version>2.2.6</version>\r\n        </dependency>\r\n        <!--   lombok     -->\r\n        <dependency>\r\n            <groupId>org.projectlombok</groupId>\r\n            <artifactId>lombok</artifactId>\r\n            <optional>true</optional>\r\n        </dependency>\r\n        <!--一个分页插件-->\r\n        <dependency>\r\n            <groupId>com.github.pagehelper</groupId>\r\n            <artifactId>pagehelper-spring-boot-starter</artifactId>\r\n            <version>1.2.9</version>\r\n        </dependency>\r\n    </dependencies>\r\n\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/teacher/pom.xml b/teacher/pom.xml
+--- a/teacher/pom.xml	(revision 69eb713dbd3d1c3e7859677e4ce07a0236151c51)
++++ b/teacher/pom.xml	(date 1623286320652)
+@@ -12,6 +12,15 @@
+     <artifactId>teacher</artifactId>
+ 
+     <dependencies>
++        <!-- redis -->
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-data-redis</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-cache</artifactId>
++        </dependency>
+         <dependency>
+             <groupId>org.example</groupId>
+             <artifactId>common</artifactId>
+Index: teacher/src/main/resources/application.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>server:\r\n  port: 8003\r\npagehelper:\r\n  helper-dialect: mysql\r\n  reasonable: true\r\nspring:\r\n  datasource:\r\n    type: com.alibaba.druid.pool.DruidDataSource\r\n    driver-class-name: com.mysql.jdbc.Driver\r\n    url: jdbc:mysql://123.56.102.13:3306/selectCourse?useUnicode=true&characterEncoding=utf-8&useSSL=false\r\n#    url: jdbc:mysql://localhost:3307/selectcourse?useUnicode=true&characterEncoding=utf-8&useSSL=false\r\n    username: root\r\n    password: zhanglei\r\n#    password: ROOTzys525#\r\n  devtools:\r\n    restart:\r\n      enabled: true\r\n      additional-paths: src/main/java\r\n      exclude: WEB-INF/**\r\n  freemarker:\r\n    cache: false\r\n  application:\r\n    name: nocos-teacher\r\n  cloud:\r\n    nacos:\r\n      discovery:\r\n        server-addr: 8.140.184.29:8848\r\n#        server-addr: localhost:8848 #配置linux使用nginx集群的nacos地址\r\nmybatis:\r\n  configuration:\r\n    map-underscore-to-camel-case: true\r\nlogging:\r\n  level.com.teacher.mapper: DEBUG\r\nmanagement:\r\n  endpoints:\r\n    web:\r\n      exposure:\r\n        include: '*'\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/teacher/src/main/resources/application.yml b/teacher/src/main/resources/application.yml
+--- a/teacher/src/main/resources/application.yml	(revision 69eb713dbd3d1c3e7859677e4ce07a0236151c51)
++++ b/teacher/src/main/resources/application.yml	(date 1623286433389)
+@@ -12,6 +12,24 @@
+     username: root
+     password: zhanglei
+ #    password: ROOTzys525#
++  redis:
++    #数据库索引
++    database: 2
++    host: 8.140.184.29
++    port: 6379
++    password: zhang
++    jedis:
++      pool:
++        #最大连接数
++        max-active: 8
++        #最大阻塞等待时间(负数表示没限制)
++        max-wait: -1
++        #最大空闲
++        max-idle: 8
++        #最小空闲
++        min-idle: 0
++        #连接超时时间
++        timeout: 10000
+   devtools:
+     restart:
+       enabled: true
+Index: admin/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\r\n    <parent>\r\n        <artifactId>spring_xk</artifactId>\r\n        <groupId>org.example</groupId>\r\n        <version>1.0-SNAPSHOT</version>\r\n    </parent>\r\n    <modelVersion>4.0.0</modelVersion>\r\n\r\n    <artifactId>admin</artifactId>\r\n\r\n    <dependencies>\r\n        <dependency>\r\n            <groupId>org.example</groupId>\r\n            <artifactId>common</artifactId>\r\n            <version>1.0-SNAPSHOT</version>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-starter-actuator</artifactId>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-devtools</artifactId>\r\n            <scope>runtime</scope>\r\n            <optional>true</optional>\r\n        </dependency>\r\n        <!--一个分页插件-->\r\n        <dependency>\r\n            <groupId>com.github.pagehelper</groupId>\r\n            <artifactId>pagehelper-spring-boot-starter</artifactId>\r\n            <version>1.2.9</version>\r\n        </dependency>\r\n        <!--sentinel-->\r\n        <dependency>\r\n            <groupId>com.alibaba.csp</groupId>\r\n            <artifactId>sentinel-datasource-nacos</artifactId>\r\n        </dependency>\r\n\r\n        <dependency>\r\n            <groupId>com.alibaba.cloud</groupId>\r\n            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>\r\n        </dependency>\r\n\r\n        <dependency>\r\n            <groupId>org.springframework.cloud</groupId>\r\n            <artifactId>spring-cloud-starter-openfeign</artifactId>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>org.springframework.cloud</groupId>\r\n            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>\r\n        </dependency>\r\n\r\n</dependencies>\r\n\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/admin/pom.xml b/admin/pom.xml
+--- a/admin/pom.xml	(revision 69eb713dbd3d1c3e7859677e4ce07a0236151c51)
++++ b/admin/pom.xml	(date 1623287136805)
+@@ -12,6 +12,15 @@
+     <artifactId>admin</artifactId>
+ 
+     <dependencies>
++        <!-- redis -->
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-data-redis</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-cache</artifactId>
++        </dependency>
+         <dependency>
+             <groupId>org.example</groupId>
+             <artifactId>common</artifactId>

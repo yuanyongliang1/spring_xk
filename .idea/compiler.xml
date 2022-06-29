@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="admin" />
+        <module name="teacher" />
+        <module name="common" />
+        <module name="student" />
+        <module name="gateway" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="admin" target="1.8" />
+      <module name="common" target="1.8" />
+      <module name="gateway" target="1.8" />
+      <module name="spring_xk" target="1.8" />
+      <module name="student" target="1.8" />
+      <module name="teacher" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.student.mapper.StudentMapper">
+    <delete id="delCourse">
+        delete from student_elective
+        where stu_account = #{stuAccount} and cou_id = #{couId}
+    </delete>
+    <!-- 登录 -->
+    <select id="studentLogin" resultType="com.select.pojo.Student">
+        select *
+        from student
+        where stu_account = #{stuAccount}
+          and stu_password = #{stuPassword}
+    </select>
+    <!-- 查看选课 -->
+    <select id="getCourse" resultType="com.select.pojo.vo.SelVo">
+        select
+        cr_maxsize,cou.cou_id,cou_name,tea_name,cou_time,cou_week,cou_lea_time,cou_lea_num,cou.cr_place,cou_stu_num,cou_lev,cou_introduce,cou_status,cou_department
+        from courses cou
+        inner join teacher tea on tea.tea_account = cou.tea_account
+        inner join classroom cr on cr.cr_place = cou.cr_place
+        and cou_grade = #{couGrade}
+        <if test="couDepartment != null">
+            and (cou_department = #{couDepartment} OR cou_department = '校级')
+        </if>
+        <if test='couDepartment2 != null'>
+            and cou_department = #{couDepartment2}
+        </if>
+        <if test='couWeek != null'>
+            and cou_week = #{couWeek}
+        </if>
+        <if test='couTime != null'>
+            and cou_time = #{couTime}
+        </if>
+    </select>
+    <!-- 查询成绩 -->
+    <select id="selectach" resultType="com.select.pojo.vo.AchievementVo">
+        select c.cou_name,
+        a.ach_day,
+        a.ach_day_Proportion,
+        a.ach_end,
+        a.ach_end_Proportion,
+        a.ach_num,
+        c.cou_lea_num,
+        t.tea_name
+        from achievement a
+        inner join courses c on a.cou_id = c.cou_id
+        inner join teacher t on c.tea_account = t.tea_account
+        where a.stu_account = #{stuAccount}
+        <if test='semester != null and semester!= "" '>
+            and semester = #{semester}
+        </if>
+    </select>
+    <!-- 查看选课详情信息 -->
+    <select id="selectele" resultType="com.select.pojo.vo.ElectiveVo">
+        select c.cou_name,
+        t.tea_name,
+        c.cou_lea_time,
+        c.cou_lea_num,
+        c.cou_week,
+        c.cr_place,
+        c.cou_time,
+        c.cou_stu_num,
+        cl.cr_maxsize,
+        c.cou_department,
+        c.cou_introduce
+        from student_elective se
+        INNER JOIN courses c on se.cou_id = c.cou_id
+        INNER JOIN teacher t on t.tea_account = c.tea_account
+        INNER JOIN classroom cl on c.cr_place = cl.cr_place
+        where se.stu_account = #{stuAccount}
+        <if test='courseFlag != null and courseFlag!= "" '>
+            and se.course_flag = #{courseFlag}
+        </if>
+    </select>
+    <!-- 查看选课开始结束时间 -->
+    <select id="selectData" resultType="com.select.pojo.Semester">
+        select sel_start_time, sel_over_time
+        from semester
+    </select>
+    <!-- 查看学期 -->
+    <select id="selectSem" resultType="java.lang.String">
+        select semester
+        from achievement
+    </select>
+    <select id="selectstuele" resultType="com.select.pojo.StudentElective">
+        select time_stamp from student_elective
+        where stu_account = #{stuAccount} and cou_id = #{couId}
+    </select>
+    <!-- 添加学生选课信息 -->
+    <insert id="insertcouser">
+        insert into student_elective (stu_account, cou_id, stu_name, course_flag, time_stamp)
+        values (#{stuAccount}, #{couId}, #{stuName}, #{courseFlag}, #{timeStamp})
+    </insert>
+
+    <update id="upCourse">
+        update courses
+        set cou_stu_num = #{couStuNum}
+        where cou_id = #{couId}
+    </update>
+</mapper>

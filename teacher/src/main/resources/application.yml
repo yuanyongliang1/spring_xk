@@ -1,0 +1,68 @@
+server:
+  port: 8003
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://123.56.102.13:3306/selectCourse?useUnicode=true&characterEncoding=utf-8&useSSL=false
+#    url: jdbc:mysql://localhost:3307/selectcourse?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: zhanglei
+#    password: ROOTzys525#
+  redis:
+    #数据库索引
+    database: 2
+    host: 8.140.184.29
+    port: 6379
+    password: zhang
+    jedis:
+      pool:
+        #最大连接数
+        max-active: 8
+        #最大阻塞等待时间(负数表示没限制)
+        max-wait: -1
+        #最大空闲
+        max-idle: 8
+        #最小空闲
+        min-idle: 0
+        #连接超时时间
+        timeout: 10000
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+      exclude: WEB-INF/**
+  freemarker:
+    cache: false
+  application:
+    name: nocos-teacher
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 8.140.184.29:8848
+#        server-addr: localhost:8848 #配置linux使用nginx集群的nacos地址
+    sentinel:
+      transport:
+        # 配置sentinel dashboard地址
+        dashboard: localhost:8080
+        # 默认 8719端口，假如被占用从8719开始+1扫描直到直到未被占用的端口
+        port: 8720
+        #客户端地址，，注意：sentinel在服务器客户端也要服务器，要公网ip才能监控到
+    #        ipclient: 192.168.43.240
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level.com.teacher.mapper: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+feign:
+  sentinel:
+    enabled: true

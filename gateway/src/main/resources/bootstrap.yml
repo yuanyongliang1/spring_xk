@@ -1,0 +1,45 @@
+server:
+  port: 9527
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 8.140.184.29:8848
+      config:
+        server-addr: 8.140.184.29:8848
+        file-extension: yml
+        group: DEV_GROUP
+        namespace: 23acd22d-8e4a-4df8-b61e-80269ee0436f
+    gateway:
+      discovery:
+        locator:
+          enabled: true # 开启从服务在注册中心动态创建路由的功能
+      routes: # 可以配置多个路由
+#        - id: payment_routh # 路由id，没有固定规则但要求唯一
+#          #          uri:  http://localhost:8001 # 匹配后提供服务的路由地址
+#          uri: lb://service-feign
+#          predicates:
+#            - Path=/feginstudent/** # 路径相匹配的进行路由
+#            - After=2020-05-26T17:07:03.043+08:00[Asia/Shanghai]
+
+        - id: payment_routh2 # 路由id，没有固定规则但要求唯一
+          #          uri:  http://localhost:8001 # 匹配后提供服务的路由地址
+          uri: lb://adminer
+          predicates:
+            - Path=/adminer/** # 路径相匹配的进行路由
+            - After=2020-05-26T17:07:03.043+08:00[Asia/Shanghai]
+
+        - id: payment_routh3 # 路由id，没有固定规则但要求唯一
+            #          uri:  http://localhost:8001 # 匹配后提供服务的路由地址
+          uri: lb://teacher
+          predicates:
+            - Path=/teacher/** # 路径相匹配的进行路由
+
+
+        - id: payment_routh4 # 路由id，没有固定规则但要求唯一
+            #          uri:  4http://localhost:8001 # 匹配后提供服务的路由地址
+          uri: lb://nacos-student
+          predicates:
+            - Path=/student/** # 路径相匹配的进行路由
